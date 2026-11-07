@@ -1,15 +1,16 @@
-%global	debug_package %{nil}
-%define	oname	CsoundQt
+%global		debug_package %{nil}
+%define		oname	CsoundQt
 
 Summary:	Front-end for the csound sound processor
 Name:	csoundqt
-Version:	7.0.0
-Release:	0.beta.2
-License:	LGPLv2+
+Version:	7.4.5
+Release:	1
+License:	LGPL-2.0-or-later
 Group:	Sound
 Url:			https://csoundqt.github.io/
-#Source0:	https://github.com/%%{oname}/%%{oname}/archive/%%{oname}-%%{version}.tar.gz
-Source0:	%{oname}-%{version}-beta2.tar.xz
+# Submodules are a pain...
+#Source0:	https://github.com/CSoundQt/%%{oname}/archive/%%{oname}-%%{version}.tar.gz
+Source0:	%{oname}-%{version}.tar.xz
 BuildRequires:	byacc
 BuildRequires:	cmake
 BuildRequires:	csound >= 7.0.0
@@ -60,11 +61,11 @@ users more immediate control of their sound. It hopes to be both a simple
 tool for the beginner, as well as a powerful tool for experienced users.
 
 %files
-%doc ChangeLog COPYING README.md
-%doc doc/*.pdf doc/images/* release_notes/*.md
+%doc COPYING README.md
+%doc doc/images/* notes/*.md release_notes/*
 %{_bindir}/*
 %{_datadir}/%{name}
-%{_datadir}/applications/%{name}.desktop
+%{_datadir}/applications/io.github.%{oname}.%{oname}.desktop
 %{_datadir}/mime/packages/x-csound-*.xml
 %{_datadir}/icons/hicolor/*/mimetypes/csound.png
 %{_datadir}/icons/hicolor/scalable/apps/%{name}.svg
@@ -72,18 +73,18 @@ tool for the beginner, as well as a powerful tool for experienced users.
 #----------------------------------------------------------------------------
 
 %prep
-%autosetup -p1 -n %{oname}-%{version}-beta2
+%autosetup -p1 -n %{oname}-%{version}
 
 # Fix paths
-sed -i s,"/usr/lib","%{_libdir}",g qcs-unix.pro
-sed -i s,"/usr/local/include","%{_includedir}",g qcs-unix.pro
+sed -i s,"/usr/lib","%{_libdir}",g qmake/qcs-unix.pro
+sed -i s,"/usr/local/include","%{_includedir}",g qmake/qcs-unix.pro
 
 
 %build
 export CFLAGS="%{optflags}"
 export CXXFLAGS="%{optflags}"
 export LDFLAGS="%{ldflags}"
-%{_bindir}/qmake-qt6 qcs.pro CONFIG+=html_webengine CONFIG+=html_support CONFIG+=rtmidi \
+%{_bindir}/qmake-qt6 qcs.pro CONFIG+=html_support CONFIG+=html_support CONFIG+=rtmidi \
 											INSTALL_DIR="%{buildroot}%{_prefix}" SHARE_DIR="%{buildroot}%{_datadir}" \
 %if "lib64" != "lib" 
 	libsuff=64 \
@@ -109,4 +110,3 @@ cp -a images %{buildroot}%{_datadir}/%{name}
 # Fix perms
 chmod -x "%{buildroot}%{_datadir}/%{name}/Examples/McCurdy Collection/LiveAudioIn/pitchamdf.csd"
 chmod -x "%{buildroot}%{_datadir}/%{name}/Examples/CsoundQt/K Miscellaneous/Pseudostereo.csd"
-chmod -x %{buildroot}%{_datadir}/applications/%{name}.desktop 
